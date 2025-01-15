@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>決済用 QR コード</title>
+    <script src="https://static.woff.worksmobile.com/sdk/1.1.0/woff.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>決済用 QR コードアプリ</h1>
+        <div id="error" style="display:none; color: red;"></div>
+        <div id="main" style="display:none;">
+            <p>ようこそ、<span id="username"></span> さん</p>
+            <label for="amount">金額を入力してください：</label>
+            <input type="number" id="amount" placeholder="金額 (円)" />
+            <button id="payButton">支払い</button>
+            <div id="qrcode" style="margin-top: 20px;"></div>
+            <div id="countdown" style="color: green; margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 初期化処理
+        document.addEventListener('DOMContentLoaded', async () => {
+            // WOFF クライアント内か確認
+            if (!woff.isInClient()) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'このアプリはモバイルアプリからのみ利用できます。';
+                return;
+            }
+
+            // プロフィール取得
+            try {
+                const profile = await woff.getProfile();
+                const userId = profile.userId;
+                const userName = profile.name;
+
+                document.getElementById('username').textContent = userName;
+                document.getElementById('main').style.display = 'block';
+
+                // 支払いボタンのクリックイベント
+                document.getElementById('payButton').addEventListener('click', () => {
+                    const amount = document.getElementById('amount').value;
+
+                    if (!amount || amount <= 0) {
+                        alert('金額を正しく入力してください。');
+                        return;
+                    }
+
+                    // QR コード生成データ
+                    const qrData = {
+                        userId,
+                        userName,
+                        amount,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // QR コードを生成
+                    generateQRCode(JSON.stringify(qrData));
+
+                    // カウントダウンタイマーを開始
+                    startCountdown(180);
+                });
+            } catch (error) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'プロフィール情報の取得に失敗しました。';
+            }
+        });
+
+        // QR コード生成
+        function generateQRCode(data) {
+            const qrCodeContainer = document.getElementById('qrcode');
+            qrCodeContainer.innerHTML = '';
+            const qrCode = new QRCode(qrCodeContainer, {
+                text: data,
+                width: 256,
+                height: 256
+            });
+        }
+
+        // カウントダウンタイマー
+        function startCountdown(seconds) {
+            const countdownElement = document.getElementById('countdown');
+            let timeLeft = seconds;
+
+            const interval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                countdownElement.textContent = `有効期限: ${minutes}分${seconds}秒`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    countdownElement.textContent = 'この QR コードは無効になりました。';
+                    document.getElementById('qrcode').innerHTML = '';
+                }
+
+                timeLeft--;
+            }, 1000);
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>

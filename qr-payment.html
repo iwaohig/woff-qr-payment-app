@@ -33,16 +33,23 @@
                 console.log("WOFF アプリが正常に初期化されました。");
 
                 // WOFF クライアント内かどうかをログ出力
-                if (!woff.isInClient()) {
-                    console.warn("WOFF クライアント外で実行されています。");
+                const isInClient = woff.isInClient();
+                console.log(`WOFF クライアント内: ${isInClient}`);
+
+                if (!isInClient) {
+                    console.warn("WOFF クライアント外で実行されています。ログインを試みます。");
+
+                    // クライアント外の場合はログインを実行
+                    await woff.login();
+                    console.log("ログインに成功しました。");
                 }
 
-                // プロフィール取得を試みる
+                // プロフィール取得
                 const profile = await woff.getProfile();
                 initializeApp(profile);
 
             } catch (err) {
-                console.error("初期化またはプロフィール取得エラー:", err.code, err.message);
+                console.error("エラー:", err.code, err.message);
                 document.getElementById('error').style.display = 'block';
                 document.getElementById('error').textContent = `エラーが発生しました: ${err.message}`;
             }

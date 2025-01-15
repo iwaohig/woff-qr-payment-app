@@ -23,10 +23,11 @@
     <script>
         // 初期化処理
         document.addEventListener('DOMContentLoaded', async () => {
-            // WOFF 初期化
+            const woffId = "H6ag0dmIkqaTU9bQX3Tosg"; // 実際の WOFF ID に置き換える
             try {
+                // WOFF アプリを初期化
                 await woff.init({
-                    woffId: "H6ag0dmIkqaTU9bQX3Tosg" // 発行された WOFF ID を指定
+                    woffId: woffId
                 });
 
                 console.log("WOFF アプリが正常に初期化されました。");
@@ -71,9 +72,9 @@
                 });
 
             } catch (err) {
-                console.log(err.code, err.message);
+                console.error("初期化エラー:", err.code, err.message);
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'WOFF アプリの初期化に失敗しました。';
+                document.getElementById('error').textContent = `WOFF アプリの初期化に失敗しました: ${err.message}`;
             }
         });
 
@@ -81,7 +82,7 @@
         function generateQRCode(data) {
             const qrCodeContainer = document.getElementById('qrcode');
             qrCodeContainer.innerHTML = '';
-            const qrCode = new QRCode(qrCodeContainer, {
+            new QRCode(qrCodeContainer, {
                 text: data,
                 width: 256,
                 height: 256

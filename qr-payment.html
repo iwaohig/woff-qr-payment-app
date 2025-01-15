@@ -32,59 +32,60 @@
 
                 console.log("WOFF アプリが正常に初期化されました。");
 
-                // WOFF クライアント内か確認
+                // WOFF クライアント内かどうかをログ出力
                 if (!woff.isInClient()) {
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').textContent = 'このアプリはモバイルアプリからのみ利用できます。';
+                    console.warn("WOFF クライアント外で実行されています。");
+                }
+
+                // プロフィール取得を試みる
+                const profile = await woff.getProfile();
+                initializeApp(profile);
+
+            } catch (err) {
+                console.error("初期化またはプロフィール取得エラー:", err.code, err.message);
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = `エラーが発生しました: ${err.message}`;
+            }
+        });
+
+        // アプリの初期化処理
+        function initializeApp(profile) {
+            console.log("取得したプロフィール情報:", profile);
+
+            const userId = profile.userId || "不明なID";
+            const userName = profile.name || "不明なユーザー";
+
+            console.log(`ユーザーID: ${userId}`);
+            console.log(`ユーザー名: ${userName}`);
+
+            // DOM に表示
+            document.getElementById('username').textContent = userName;
+            document.getElementById('main').style.display = 'block';
+
+            // 支払いボタンのクリックイベント
+            document.getElementById('payButton').addEventListener('click', () => {
+                const amount = document.getElementById('amount').value;
+
+                if (!amount || amount <= 0) {
+                    alert('金額を正しく入力してください。');
                     return;
                 }
 
-                // プロフィール取得
-                const profile = await woff.getProfile();
-                console.log("取得したプロフィール情報:", profile);
+                // QR コード生成データ
+                const qrData = {
+                    userId,
+                    userName,
+                    amount,
+                    timestamp: new Date().toISOString()
+                };
 
-                // プロフィール情報からユーザー名とユーザーIDを取得
-                const userId = profile.userId || "不明なID";
-                const userName = profile.name || "不明なユーザー";
+                // QR コードを生成
+                generateQRCode(JSON.stringify(qrData));
 
-                // デバッグログ
-                console.log(`ユーザーID: ${userId}`);
-                console.log(`ユーザー名: ${userName}`);
-
-                // DOM に表示
-                document.getElementById('username').textContent = userName;
-                document.getElementById('main').style.display = 'block';
-
-                // 支払いボタンのクリックイベント
-                document.getElementById('payButton').addEventListener('click', () => {
-                    const amount = document.getElementById('amount').value;
-
-                    if (!amount || amount <= 0) {
-                        alert('金額を正しく入力してください。');
-                        return;
-                    }
-
-                    // QR コード生成データ
-                    const qrData = {
-                        userId,
-                        userName,
-                        amount,
-                        timestamp: new Date().toISOString()
-                    };
-
-                    // QR コードを生成
-                    generateQRCode(JSON.stringify(qrData));
-
-                    // カウントダウンタイマーを開始
-                    startCountdown(180);
-                });
-
-            } catch (err) {
-                console.error("初期化エラー:", err.code, err.message);
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = `WOFF アプリの初期化に失敗しました: ${err.message}`;
-            }
-        });
+                // カウントダウンタイマーを開始
+                startCountdown(180);
+            });
+        }
 
         // QR コード生成
         function generateQRCode(data) {

@@ -23,15 +23,22 @@
     <script>
         // 初期化処理
         document.addEventListener('DOMContentLoaded', async () => {
-            // WOFF クライアント内か確認
-            if (!woff.isInClient()) {
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'このアプリはモバイルアプリからのみ利用できます。';
-                return;
-            }
-
-            // プロフィール取得
+            // WOFF 初期化
             try {
+                await woff.init({
+                    woffId: "H6ag0dmIkqaTU9bQX3Tosg" // 発行された WOFF ID を指定
+                });
+
+                console.log("WOFF アプリが正常に初期化されました。");
+
+                // WOFF クライアント内か確認
+                if (!woff.isInClient()) {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = 'このアプリはモバイルアプリからのみ利用できます。';
+                    return;
+                }
+
+                // プロフィール取得
                 const profile = await woff.getProfile();
                 const userId = profile.userId;
                 const userName = profile.name;
@@ -62,9 +69,11 @@
                     // カウントダウンタイマーを開始
                     startCountdown(180);
                 });
-            } catch (error) {
+
+            } catch (err) {
+                console.log(err.code, err.message);
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'プロフィール情報の取得に失敗しました。';
+                document.getElementById('error').textContent = 'WOFF アプリの初期化に失敗しました。';
             }
         });
 

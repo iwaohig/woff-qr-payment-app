@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済用 QR コード</title>
-    <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"> </script>
+    <!-- 正しい WOFF SDK のスクリプト URL -->
+    <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"></script>
 </head>
 <body>
     <div id="app">
@@ -21,11 +22,11 @@
     </div>
 
     <script>
-        // 初期化処理
         document.addEventListener('DOMContentLoaded', async () => {
-            const woffId = "H6ag0dmIkqaTU9bQX3Tosg"; // 実際の WOFF ID に置き換える
+            const woffId = "H6ag0dmIkqaTU9bQX3Tosg"; // 提供された WOFF ID を設定
+
             try {
-                // WOFF アプリを初期化
+                // WOFF 初期化
                 await woff.init({
                     woffId: woffId
                 });

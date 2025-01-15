@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済用 QR コード</title>
-    <!-- 正しい WOFF SDK のスクリプト URL -->
     <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"></script>
 </head>
 <body>
@@ -42,9 +41,17 @@
 
                 // プロフィール取得
                 const profile = await woff.getProfile();
-                const userId = profile.userId;
-                const userName = profile.name;
+                console.log("取得したプロフィール情報:", profile);
 
+                // プロフィール情報からユーザー名とユーザーIDを取得
+                const userId = profile.userId || "不明なID";
+                const userName = profile.name || "不明なユーザー";
+
+                // デバッグログ
+                console.log(`ユーザーID: ${userId}`);
+                console.log(`ユーザー名: ${userName}`);
+
+                // DOM に表示
                 document.getElementById('username').textContent = userName;
                 document.getElementById('main').style.display = 'block';
 
